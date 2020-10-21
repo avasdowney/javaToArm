@@ -60,4 +60,13 @@ public class Word {
     	return convert.signedBinaryToDecimal(get());
     }
     
+    /**
+     * sets an integer value into a word
+     * @param val value of integer
+     */
+    public void setVal(int val) {
+    	int[] valBits = convert.decimalToSignedBinary(convert.shift(val, 0), bits);
+    	set(valBits);
+    }
+    
 }
