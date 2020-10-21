@@ -90,7 +90,7 @@ public class ARM {
      * @param Rc value being added to Rn
      */
     public void add(int Rd, int Rn, int Rc) {
-    	int sum = rb.get(Rn).getVal() + Rc;
+    	int sum = rb.get(Rn).getVal() + rb.get(Rc).getVal();
     	mov(Rd, sum, 0);
     }
     
