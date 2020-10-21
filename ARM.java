@@ -38,14 +38,25 @@ public class ARM {
      * @param Rd destination register
      * @param Rn register with target memory address
      * @param o offset
-     * @param pre includes ! if true
-     * @param mod_pre
+     * @param pre pre indexed
+     * @param mod_pre post indexed
      */
     public void str(int Rd, int Rn, int o, boolean pre, boolean mod_pre) {
         Word destinationWord = rb.get(Rd);
         Word memoryAddress = rb.get(Rn);
-        mb.set(destinationWord, memoryAddress.getVal() + o);
-        // TODO: add pre and mod_pre
+        int offsetValue = memoryAddress.getVal() + o; // default is memory address + offset (offset mode)
+        if (pre) {// if a pre-Offset
+			if (mod_pre == false) {// If no exclamation point
+				offsetValue = memoryAddress.getVal() + o;
+			} else { // is exclamation point
+				offsetValue = memoryAddress.getVal();
+			}
+			memoryAddress.setVal(offsetValue);
+			rb.set(Rn, memoryAddress);
+        }
+        
+        mb.set(destinationWord, offsetValue); // write offset value back
+
     }
     
     /**
@@ -58,7 +69,17 @@ public class ARM {
      */
     public void ldr(int Rd, int Rn, int o, boolean pre, boolean mod_pre) {
     	Word memoryAddress = rb.get(Rn);
-    	Word destinationWord = mb.get(wordLength / 8, memoryAddress.getVal() + o);
+    	int offsetValue = memoryAddress.getVal() + o;
+    	if (pre) { // if pre-offset
+    		if (mod_pre == false) { // if no exclamation point
+    			offsetValue = memoryAddress.getVal() + o;	
+    		} else {
+    			offsetValue = memoryAddress.getVal();
+    		}
+    		memoryAddress.setVal(offsetValue);
+    		rb.set(Rn, memoryAddress);
+    	}
+    	Word destinationWord = mb.get(wordLength / 8, offsetValue);
     	rb.set(Rd, destinationWord);
     }
     
@@ -78,17 +99,15 @@ public class ARM {
      */
     public void print() {
         int[] val;
-        int registerNum = 0;
         
-        for (int i=0; i<=registers; i++) {
-        	val = rb.get(registerNum).get();
-        	System.out.print("REGISTER " + registerNum + ":\t");
+        for (int i=0; i<registers; i++) {
+        	val = rb.get(i).get();
+        	System.out.print("REGISTER " + i + ":\t");
         	for (int j=0; j<wordLength; j++) {
         		System.out.print(val[j]);
         	}
         	
         	System.out.println();
-        	registerNum ++;
         	
         }
         
